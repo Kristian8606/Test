@@ -60,7 +60,6 @@ export class ExamplePlatformAccessory {
 
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
-    this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.exampleDisplayName);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/Lightbulb
@@ -72,11 +71,13 @@ export class ExamplePlatformAccessory {
    
     this.humidity = this.accessory.getService('Humidity') ||
       this.accessory.addService(this.platform.Service.HumiditySensor, 'Humidity', 'Hum');
-    
+
+    this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.exampleDisplayName);
+
     this.humidity.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
       .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
    
-    const historyInterval = 1; // history interval in minutes
+    const historyInterval = 10; // history interval in minutes
 
     const FakeGatoHistoryService = fakegato(this.platform.api);
     this.historyService = new FakeGatoHistoryService('weather', this.accessory, {
@@ -84,11 +85,17 @@ export class ExamplePlatformAccessory {
       //minutes: historyInterval,
     });
     //this.historyService.log = this.platform.log; // swicthed off to prevent flooding the log
-    this.historyService.name = this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature);
+    this.historyService.name = accessory.context.device.exampleUniqueId;
     
-    
+    console.log(this.historyService.name);
   
      
+  
+    setInterval(() => {
+      this.platform.log.debug('Running interval');
+      this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000),
+        temp: this.temperatureVal, pressure: this.pressureVal, humidity: this.humidityVal});
+    }, 1000 * 60 * historyInterval);
     
     setInterval(() => {
       // EXAMPLE - inverse the trigger
@@ -97,9 +104,7 @@ export class ExamplePlatformAccessory {
       this.humidityVal = Math.random() * 100;
       this.pressureVal = Math.random() * 1000;
 
-      this.platform.log.debug('Running interval');
-      this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000),
-        temp: this.temperatureVal, pressure: this.pressureVal, humidity: this.humidityVal})
+    
    
 
       this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.temperatureVal);
@@ -109,7 +114,7 @@ export class ExamplePlatformAccessory {
       this.platform.log.debug('Temp:', this.temperatureVal);
       this.platform.log.debug('Hum:', this.humidityVal);
       this.platform.log.debug('Press:', this.pressureVal);
-    }, 1000 * 60 * historyInterval);
+    }, 30000);
   }
 
   handleCurrentTemperatureGet(callback) {
