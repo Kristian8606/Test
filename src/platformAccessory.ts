@@ -1,6 +1,8 @@
+/* eslint-disable max-len */
 import { Service, PlatformAccessory, CharacteristicValue, CharacteristicSetCallback, CharacteristicGetCallback } from 'homebridge';
-
+//import FakeGatoHistoryService from 'fakegato-history';
 import { ExampleHomebridgePlatform } from './platform';
+import fakegato from 'fakegato-history';
 
 /**
  * Platform Accessory
@@ -9,7 +11,13 @@ import { ExampleHomebridgePlatform } from './platform';
  */
 export class ExamplePlatformAccessory {
   private service: Service;
+  private motionSensorOneService: Service;
+  
+  private FakeGatoHistoryService; 
+ 
+  private historyService: fakegato.FakeGatoHistoryService;
 
+   
   /**
    * These are just used to create a working example
    * You should implement your own code to track the state of your accessory
@@ -19,11 +27,19 @@ export class ExamplePlatformAccessory {
     Brightness: 100,
   };
 
+
+ 
+
+  
+
   constructor(
     private readonly platform: ExampleHomebridgePlatform,
     private readonly accessory: PlatformAccessory,
+    
   ) {
-
+    
+   
+    //Accessory.log = this.log;
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Default-Manufacturer')
@@ -33,6 +49,10 @@ export class ExamplePlatformAccessory {
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.Lightbulb) || this.accessory.addService(this.platform.Service.Lightbulb);
+
+    
+   
+    //this.fakegatoService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: 1});
 
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
@@ -51,6 +71,9 @@ export class ExamplePlatformAccessory {
       .on('set', this.setBrightness.bind(this));       // SET - bind to the 'setBrightness` method below
 
 
+    //this.loggingService = new FakeGatoHistoryService('weather', this, { storage: 'fs' });
+
+
     /**
      * Creating multiple services of the same type.
      * 
@@ -63,33 +86,43 @@ export class ExamplePlatformAccessory {
      */
 
     // Example: add two "motion sensor" services to the accessory
-    const motionSensorOneService = this.accessory.getService('Motion Sensor One Name') ||
+    this.motionSensorOneService = this.accessory.getService('Motion Sensor One Name') ||
       this.accessory.addService(this.platform.Service.MotionSensor, 'Motion Sensor One Name', 'YourUniqueIdentifier-1');
 
     const motionSensorTwoService = this.accessory.getService('Motion Sensor Two Name') ||
       this.accessory.addService(this.platform.Service.MotionSensor, 'Motion Sensor Two Name', 'YourUniqueIdentifier-2');
 
-    /**
-     * Updating characteristics values asynchronously.
-     * 
-     * Example showing how to update the state of a Characteristic asynchronously instead
-     * of using the `on('get')` handlers.
-     * Here we change update the motion sensor trigger states on and off every 10 seconds
-     * the `updateCharacteristic` method.
-     * 
-     */
+    const historyInterval = 10; // history interval in minutes
+
+    const FakeGatoHistoryService = fakegato(this.platform.api);
+    this.historyService = new FakeGatoHistoryService('motion', this.accessory, {
+      storage: 'fs',
+      minutes: historyInterval,
+    });
+    //this.historyService.log = this.platform.log; // swicthed off to prevent flooding the log
+    this.historyService.name = this.motionSensorOneService.getCharacteristic(this.platform.Characteristic.MotionDetected);
+   
+    
+  
+     
     let motionDetected = false;
     setInterval(() => {
       // EXAMPLE - inverse the trigger
       motionDetected = !motionDetected;
-
+      this.platform.log.debug('Running interval');
+      // this.updateAccessoryCharacteristics();
+      this.historyService.addEntry({
+        time: Date.now(),
+        temp: 1,
+      });
       // push the new value to HomeKit
-      motionSensorOneService.updateCharacteristic(this.platform.Characteristic.MotionDetected, motionDetected);
+      this.motionSensorOneService.updateCharacteristic(this.platform.Characteristic.MotionDetected, motionDetected);
       motionSensorTwoService.updateCharacteristic(this.platform.Characteristic.MotionDetected, !motionDetected);
+      // this.loggingService.addEntry({time: Math.round(new Date().valueOf() / 1000), temp: 25, pressure: 950, humidity: 44});
 
       this.platform.log.debug('Triggering motionSensorOneService:', motionDetected);
       this.platform.log.debug('Triggering motionSensorTwoService:', !motionDetected);
-    }, 10000);
+    }, 1000 * 60 * historyInterval);
   }
 
   /**
