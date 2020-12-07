@@ -19,7 +19,7 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
   private FakeGatoHistoryService; 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
-  
+
   constructor(
     public readonly log: Logger,
     public readonly config: PlatformConfig,
@@ -71,11 +71,11 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 			  // or a user-defined array in the platform config.
 			  const exampleDevices = [
 			    {
-			      exampleUniqueId: 'ABCD',
+			      exampleUniqueId: 'AdBCD',
 			      exampleDisplayName: 'Bedroom',
 			    },
 			    {
-			      exampleUniqueId: 'EFGH',
+			      exampleUniqueId: 'EFfgGH',
 			      exampleDisplayName: 'Kitchen',
 			    },
     ];

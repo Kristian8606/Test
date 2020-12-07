@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable max-len */
 import { Service, PlatformAccessory, CharacteristicValue, CharacteristicSetCallback, CharacteristicGetCallback } from 'homebridge';
 //import FakeGatoHistoryService from 'fakegato-history';
@@ -11,12 +12,15 @@ import fakegato from 'fakegato-history';
  */
 export class ExamplePlatformAccessory {
   private service: Service;
-  private motionSensorOneService: Service;
+  private humidity: Service;
   
   private FakeGatoHistoryService; 
  
   private historyService: fakegato.FakeGatoHistoryService;
 
+    temperatureVal;
+    humidityVal;
+    pressureVal;
    
   /**
    * These are just used to create a working example
@@ -48,7 +52,7 @@ export class ExamplePlatformAccessory {
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
-    this.service = this.accessory.getService(this.platform.Service.Lightbulb) || this.accessory.addService(this.platform.Service.Lightbulb);
+    this.service = this.accessory.getService(this.platform.Service.TemperatureSensor) || this.accessory.addService(this.platform.Service.TemperatureSensor);
 
     
    
@@ -61,124 +65,68 @@ export class ExamplePlatformAccessory {
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/Lightbulb
 
-    // register handlers for the On/Off Characteristic
-    this.service.getCharacteristic(this.platform.Characteristic.On)
-      .on('set', this.setOn.bind(this))                // SET - bind to the `setOn` method below
-      .on('get', this.getOn.bind(this));               // GET - bind to the `getOn` method below
+    this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      .on('get', this.handleCurrentTemperatureGet.bind(this));  
 
     // register handlers for the Brightness Characteristic
-    this.service.getCharacteristic(this.platform.Characteristic.Brightness)
-      .on('set', this.setBrightness.bind(this));       // SET - bind to the 'setBrightness` method below
-
-
-    //this.loggingService = new FakeGatoHistoryService('weather', this, { storage: 'fs' });
-
-
-    /**
-     * Creating multiple services of the same type.
-     * 
-     * To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
-     * when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-     * this.accessory.getService('NAME') || this.accessory.addService(this.platform.Service.Lightbulb, 'NAME', 'USER_DEFINED_SUBTYPE_ID');
-     * 
-     * The USER_DEFINED_SUBTYPE must be unique to the platform accessory (if you platform exposes multiple accessories, each accessory
-     * can use the same sub type id.)
-     */
-
-    // Example: add two "motion sensor" services to the accessory
-    this.motionSensorOneService = this.accessory.getService('Motion Sensor One Name') ||
-      this.accessory.addService(this.platform.Service.MotionSensor, 'Motion Sensor One Name', 'YourUniqueIdentifier-1');
-
-    const motionSensorTwoService = this.accessory.getService('Motion Sensor Two Name') ||
-      this.accessory.addService(this.platform.Service.MotionSensor, 'Motion Sensor Two Name', 'YourUniqueIdentifier-2');
-
-    const historyInterval = 10; // history interval in minutes
+   
+    this.humidity = this.accessory.getService('Humidity') ||
+      this.accessory.addService(this.platform.Service.HumiditySensor, 'Humidity', 'Hum');
+    
+    this.humidity.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+      .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
+   
+    const historyInterval = 1; // history interval in minutes
 
     const FakeGatoHistoryService = fakegato(this.platform.api);
-    this.historyService = new FakeGatoHistoryService('motion', this.accessory, {
+    this.historyService = new FakeGatoHistoryService('weather', this.accessory, {
       storage: 'fs',
-      minutes: historyInterval,
+      //minutes: historyInterval,
     });
     //this.historyService.log = this.platform.log; // swicthed off to prevent flooding the log
-    this.historyService.name = this.motionSensorOneService.getCharacteristic(this.platform.Characteristic.MotionDetected);
-   
+    this.historyService.name = this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature);
+    
     
   
      
-    let motionDetected = false;
+    
     setInterval(() => {
       // EXAMPLE - inverse the trigger
-      motionDetected = !motionDetected;
-      this.platform.log.debug('Running interval');
-      // this.updateAccessoryCharacteristics();
-      this.historyService.addEntry({
-        time: Date.now(),
-        temp: 1,
-      });
-      // push the new value to HomeKit
-      this.motionSensorOneService.updateCharacteristic(this.platform.Characteristic.MotionDetected, motionDetected);
-      motionSensorTwoService.updateCharacteristic(this.platform.Characteristic.MotionDetected, !motionDetected);
-      // this.loggingService.addEntry({time: Math.round(new Date().valueOf() / 1000), temp: 25, pressure: 950, humidity: 44});
 
-      this.platform.log.debug('Triggering motionSensorOneService:', motionDetected);
-      this.platform.log.debug('Triggering motionSensorTwoService:', !motionDetected);
+      this.temperatureVal = Math.random() * 38;
+      this.humidityVal = Math.random() * 100;
+      this.pressureVal = Math.random() * 1000;
+
+      this.platform.log.debug('Running interval');
+      this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000),
+        temp: this.temperatureVal, pressure: this.pressureVal, humidity: this.humidityVal})
+   
+
+      this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.temperatureVal);
+      this.humidity.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.humidityVal);
+      // this.loggingService.addEntry({time: Math.round(new Date().valueOf() / 1000), temp: 25, pressure: 950, humidity: 44});
+     
+      this.platform.log.debug('Temp:', this.temperatureVal);
+      this.platform.log.debug('Hum:', this.humidityVal);
+      this.platform.log.debug('Press:', this.pressureVal);
     }, 1000 * 60 * historyInterval);
   }
 
-  /**
-   * Handle "SET" requests from HomeKit
-   * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
-   */
-  setOn(value: CharacteristicValue, callback: CharacteristicSetCallback) {
+  handleCurrentTemperatureGet(callback) {
+    this.platform.log.debug('Triggered GET CurrentTemperature');
+    // set this to a valid value for CurrentTemperature
+    const currentValue = this.temperatureVal;
 
-    // implement your own code to turn your device on/off
-    this.exampleStates.On = value as boolean;
-
-    this.platform.log.debug('Set Characteristic On ->', value);
-
-    // you must call the callback function
-    callback(null);
+    callback(null, currentValue);
   }
 
-  /**
-   * Handle the "GET" requests from HomeKit
-   * These are sent when HomeKit wants to know the current state of the accessory, for example, checking if a Light bulb is on.
-   * 
-   * GET requests should return as fast as possbile. A long delay here will result in
-   * HomeKit being unresponsive and a bad user experience in general.
-   * 
-   * If your device takes time to respond you should update the status of your device
-   * asynchronously instead using the `updateCharacteristic` method instead.
+  handleCurrentRelativeHumidityGet(callback) {
+    this.platform.log.debug('Triggered GET CurrentRelativeHumidity');
 
-   * @example
-   * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
-   */
-  getOn(callback: CharacteristicGetCallback) {
+    // set this to a valid value for CurrentRelativeHumidity
+    const currentValue = this.humidityVal;
 
-    // implement your own code to check if the device is on
-    const isOn = this.exampleStates.On;
-
-    this.platform.log.debug('Get Characteristic On ->', isOn);
-
-    // you must call the callback function
-    // the first argument should be null if there were no errors
-    // the second argument should be the value to return
-    callback(null, isOn);
-  }
-
-  /**
-   * Handle "SET" requests from HomeKit
-   * These are sent when the user changes the state of an accessory, for example, changing the Brightness
-   */
-  setBrightness(value: CharacteristicValue, callback: CharacteristicSetCallback) {
-
-    // implement your own code to set the brightness
-    this.exampleStates.Brightness = value as number;
-
-    this.platform.log.debug('Set Characteristic Brightness -> ', value);
-
-    // you must call the callback function
-    callback(null);
+    callback(null, currentValue);
   }
 
 }
