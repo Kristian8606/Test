@@ -31,7 +31,6 @@ export class ExamplePlatformAccessory {
     Brightness: 100,
   };
 
-  log: any;
 
 
  
@@ -80,7 +79,7 @@ export class ExamplePlatformAccessory {
     //this.humidity.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
     //.on('get', this.handleCurrentRelativeHumidityGet.bind(this));
 
-    this.log = this.platform.log;
+    //this.log = this.platform.log;
    
     const historyInterval = 10; // history interval in minutes
 
@@ -92,7 +91,7 @@ export class ExamplePlatformAccessory {
     });
     */
     //this.historyService.log = this.platform.log; // swicthed off to prevent flooding the log
-    this.historyService = new FakeGatoHistoryService('switch', this.accessory, {minutes:1});
+    this.historyService = new FakeGatoHistoryService('switch', this.accessory, {minutes:10});
     this.historyService.accessoryName = accessory.context.device.exampleDisplayName;
     this.historyService.log = this.platform.log;
      
