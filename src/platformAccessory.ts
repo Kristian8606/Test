@@ -12,13 +12,13 @@ import fakegato from 'fakegato-history';
  */
 export class ExamplePlatformAccessory {
   private service: Service;
-  private humidity: Service;
+  //private humidity: Service;
   
   private FakeGatoHistoryService; 
  
   private historyService: fakegato.FakeGatoHistoryService;
 
-    temperatureVal;
+    state;
     humidityVal;
     pressureVal;
    
@@ -30,6 +30,8 @@ export class ExamplePlatformAccessory {
     On: false,
     Brightness: 100,
   };
+
+  log: any;
 
 
  
@@ -52,7 +54,7 @@ export class ExamplePlatformAccessory {
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
-    this.service = this.accessory.getService(this.platform.Service.TemperatureSensor) || this.accessory.addService(this.platform.Service.TemperatureSensor);
+    this.service = this.accessory.getService(this.platform.Service.Switch) || this.accessory.addService(this.platform.Service.Switch);
 
     
    
@@ -64,74 +66,90 @@ export class ExamplePlatformAccessory {
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/Lightbulb
 
-    this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
-      .on('get', this.handleCurrentTemperatureGet.bind(this));  
+    this.service.getCharacteristic(this.platform.Characteristic.On)
+      .on('get', this.handleOnGet.bind(this))
+      .on('set', this.handleOnSet.bind(this));  
 
     // register handlers for the Brightness Characteristic
-   
+    /*
     this.humidity = this.accessory.getService('Humidity') ||
       this.accessory.addService(this.platform.Service.HumiditySensor, 'Humidity', 'Hum');
-
+    */
     this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.exampleDisplayName);
 
-    this.humidity.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
-      .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
+    //this.humidity.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+    //.on('get', this.handleCurrentRelativeHumidityGet.bind(this));
+
+    this.log = this.platform.log;
    
     const historyInterval = 10; // history interval in minutes
 
     const FakeGatoHistoryService = fakegato(this.platform.api);
-    this.historyService = new FakeGatoHistoryService('weather', this.accessory, {
+    /*
+    this.historyService = new FakeGatoHistoryService('switch', this.accessory, {
       storage: 'fs',
       //minutes: historyInterval,
     });
+    */
     //this.historyService.log = this.platform.log; // swicthed off to prevent flooding the log
-    this.historyService.name = accessory.context.device.exampleUniqueId;
-    
-    console.log(this.historyService.name);
-  
+    this.historyService = new FakeGatoHistoryService('switch', this.accessory, {minutes:1});
+    this.historyService.accessoryName = accessory.context.device.exampleDisplayName;
+    this.historyService.log = this.platform.log;
      
   
     setInterval(() => {
       this.platform.log.debug('Running interval');
+      /*
       this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000),
         temp: this.temperatureVal, pressure: this.pressureVal, humidity: this.humidityVal});
+       
+      this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000),
+        temp: this.temperatureVal, pressure: this.pressureVal, humidity: this.humidityVal});
+        */ 
+      this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
+
     }, 1000 * 60 * historyInterval);
     
     setInterval(() => {
       // EXAMPLE - inverse the trigger
-
-      this.temperatureVal = Math.random() * 38;
+      /*
+      this.state = Math.random() * 1;
       this.humidityVal = Math.random() * 100;
       this.pressureVal = Math.random() * 1000;
-
+      */
     
    
 
-      this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.temperatureVal);
-      this.humidity.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.humidityVal);
+      this.service.updateCharacteristic(this.platform.Characteristic.On, this.state);
+      //this.humidity.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.humidityVal);
       // this.loggingService.addEntry({time: Math.round(new Date().valueOf() / 1000), temp: 25, pressure: 950, humidity: 44});
-     
+      /*
       this.platform.log.debug('Temp:', this.temperatureVal);
       this.platform.log.debug('Hum:', this.humidityVal);
       this.platform.log.debug('Press:', this.pressureVal);
+      */
     }, 30000);
   }
 
-  handleCurrentTemperatureGet(callback) {
-    this.platform.log.debug('Triggered GET CurrentTemperature');
-    // set this to a valid value for CurrentTemperature
-    const currentValue = this.temperatureVal;
+  handleOnGet(callback) {
+    this.platform.log.debug('Triggered GET On');
+
+    // set this to a valid value for On
+    const currentValue = this.state;
 
     callback(null, currentValue);
   }
 
-  handleCurrentRelativeHumidityGet(callback) {
-    this.platform.log.debug('Triggered GET CurrentRelativeHumidity');
-
-    // set this to a valid value for CurrentRelativeHumidity
-    const currentValue = this.humidityVal;
-
-    callback(null, currentValue);
+  /**
+   * Handle requests to set the "On" characteristic
+   */
+  handleOnSet(value, callback) {
+    this.platform.log.debug('Triggered SET On:', value);
+    this.state = value;
+    this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
+    callback(null);
   }
+
+ 
 
 }
