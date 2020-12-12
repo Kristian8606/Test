@@ -77,10 +77,7 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 			      exampleUniqueId: 'EFfghhtGH',
 			      exampleDisplayName: 'Kitchen',
 			    },
-			    {
-			      exampleUniqueId: 'GRDsgtFS',
-			      exampleDisplayName: 'Bulb',
-			    },
+			   
     ];
         
     
@@ -108,12 +105,8 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 			        // create the accessory handler for the restored accessory
           			// this is imported from `platformAccessory.ts`
-					 if(device.exampleDisplayName === 'Bulb'){
-            			
-			      		new ColorTemperatureBulbExample(this, existingAccessory);
-          			}else{
-            			new ExamplePlatformAccessory(this, existingAccessory);
-					  }
+					
+            		new ExamplePlatformAccessory(this, existingAccessory);
 			        // update accessory cache with any changes to the accessory details and information
 			        this.api.updatePlatformAccessories([existingAccessory]);
 			      } else if (!device) {
@@ -136,12 +129,8 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 			      // create the accessory handler for the newly create accessory
 			      // this is imported from `platformAccessory.ts`
 			     
-				  if(device.exampleDisplayName === 'Bulb'){
 			        
-			       new ColorTemperatureBulbExample(this, accessory);
-          			}else{
-            			new ExamplePlatformAccessory(this, accessory);
-					  }
+            	  new ExamplePlatformAccessory(this, accessory);
 
 			      // link the accessory to your platform
 			      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
