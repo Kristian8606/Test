@@ -1,10 +1,9 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
-//import FakeGatoHistoryService from 'fakegato-history';
-import fakegato from 'fakegato-history';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { ExamplePlatformAccessory } from './platformAccessory';
+import { ColorTemperatureBulbExample } from './ColorTemperatureBulb';
 
 
 /**
@@ -78,6 +77,10 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 			      exampleUniqueId: 'EFfghhtGH',
 			      exampleDisplayName: 'Kitchen',
 			    },
+			    {
+			      exampleUniqueId: 'GRDsgtFS',
+			      exampleDisplayName: 'Bulb',
+			    },
     ];
         
     
@@ -104,9 +107,13 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 			        // this.api.updatePlatformAccessories([existingAccessory]);
 
 			        // create the accessory handler for the restored accessory
-			        // this is imported from `platformAccessory.ts`
-			        new ExamplePlatformAccessory(this, existingAccessory);
-          
+          			// this is imported from `platformAccessory.ts`
+					 if(device.exampleDisplayName === 'Bulb'){
+            			
+			      		new ColorTemperatureBulbExample(this, existingAccessory);
+          			}else{
+            			new ExamplePlatformAccessory(this, existingAccessory);
+					  }
 			        // update accessory cache with any changes to the accessory details and information
 			        this.api.updatePlatformAccessories([existingAccessory]);
 			      } else if (!device) {
@@ -128,7 +135,13 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 			      // create the accessory handler for the newly create accessory
 			      // this is imported from `platformAccessory.ts`
-			      new ExamplePlatformAccessory(this, accessory);
+			     
+				  if(device.exampleDisplayName === 'Bulb'){
+			        
+			       new ColorTemperatureBulbExample(this, accessory);
+          			}else{
+            			new ExamplePlatformAccessory(this, accessory);
+					  }
 
 			      // link the accessory to your platform
 			      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);

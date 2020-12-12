@@ -4,6 +4,7 @@ import { Service, PlatformAccessory, CharacteristicValue, CharacteristicSetCallb
 //import FakeGatoHistoryService from 'fakegato-history';
 import { ExampleHomebridgePlatform } from './platform';
 import fakegato from 'fakegato-history';
+import { Server, ServerResponse } from 'http';
 
 /**
  * Platform Accessory
@@ -32,7 +33,8 @@ export class ExamplePlatformAccessory {
   };
 
 
-
+  net = require('net');
+ 
  
 
   
@@ -69,6 +71,7 @@ export class ExamplePlatformAccessory {
       .on('get', this.handleOnGet.bind(this))
       .on('set', this.handleOnSet.bind(this));  
 
+    
     // register handlers for the Brightness Characteristic
     /*
     this.humidity = this.accessory.getService('Humidity') ||
@@ -139,8 +142,11 @@ export class ExamplePlatformAccessory {
       this.platform.log.debug('Press:', this.pressureVal);
       */
     }, 30000);
+
+    this.web();
   }
 
+  
   handleOnGet(callback) {
     this.platform.log.debug('Triggered GET On');
 
@@ -160,10 +166,33 @@ export class ExamplePlatformAccessory {
       this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
 
     }
-    //this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
+
+    
+    
+   
+    
+   
+     
     callback(null);
   }
 
- 
-
+  web(){
+   
+     
+    // Create a server object
+    const server = this.net.createServer((socket) => {
+      socket.on('data', (data) => {
+        console.log(data.toString());
+      });
+      socket.write('SERVER: Hello! This is server speaking.<br>');
+      socket.end('SERVER: Closing connection now.<br>');
+    }).on('error', (err) => {
+      console.error(err);
+    });
+    // Open server on port 9898
+    server.listen(9898, () => {
+      console.log('opened server on', server.address().port);
+    });
+  }
+  
 }
