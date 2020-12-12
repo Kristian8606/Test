@@ -49,7 +49,7 @@ export class ExamplePlatformAccessory {
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Default-Manufacturer')
       .setCharacteristic(this.platform.Characteristic.Model, 'Default-Model')
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, 'Default-Serial');
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.exampleUniqueId);
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
@@ -83,7 +83,7 @@ export class ExamplePlatformAccessory {
    
     const historyInterval = 10; // history interval in minutes
 
-    const FakeGatoHistoryService = fakegato(this.platform.api);
+    this.FakeGatoHistoryService = fakegato(this.platform.api);
     /*
     this.historyService = new FakeGatoHistoryService('switch', this.accessory, {
       storage: 'fs',
@@ -91,10 +91,19 @@ export class ExamplePlatformAccessory {
     });
     */
     //this.historyService.log = this.platform.log; // swicthed off to prevent flooding the log
-    this.historyService = new FakeGatoHistoryService('switch', this.accessory, {minutes:10});
+    this.historyService = new this.FakeGatoHistoryService('switch', this.accessory,
+      {storage: 'fs',
+        minutes:10});
+
+    this.historyService.name = accessory.context.device.exampleDisplayName;
     this.historyService.accessoryName = accessory.context.device.exampleDisplayName;
     this.historyService.log = this.platform.log;
-     
+    this.historyService.SerialNumber = accessory.context.device.exampleUniqueId;
+
+    if(this.historyService.SerialNumber === accessory.context.device.exampleUniqueId){
+      this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
+
+    }
   
     setInterval(() => {
       this.platform.log.debug('Running interval');
@@ -105,8 +114,10 @@ export class ExamplePlatformAccessory {
       this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000),
         temp: this.temperatureVal, pressure: this.pressureVal, humidity: this.humidityVal});
         */ 
-      this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
+      if(this.historyService.SerialNumber === accessory.context.device.exampleUniqueId){
+        this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
 
+      }
     }, 1000 * 60 * historyInterval);
     
     setInterval(() => {
@@ -119,7 +130,7 @@ export class ExamplePlatformAccessory {
     
    
 
-      this.service.updateCharacteristic(this.platform.Characteristic.On, this.state);
+      // this.service.updateCharacteristic(this.platform.Characteristic.On, this.state);
       //this.humidity.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.humidityVal);
       // this.loggingService.addEntry({time: Math.round(new Date().valueOf() / 1000), temp: 25, pressure: 950, humidity: 44});
       /*
@@ -135,7 +146,7 @@ export class ExamplePlatformAccessory {
 
     // set this to a valid value for On
     const currentValue = this.state;
-
+    
     callback(null, currentValue);
   }
 
@@ -145,7 +156,11 @@ export class ExamplePlatformAccessory {
   handleOnSet(value, callback) {
     this.platform.log.debug('Triggered SET On:', value);
     this.state = value;
-    this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
+    if(this.historyService.SerialNumber === this.accessory.context.device.exampleUniqueId){
+      this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
+
+    }
+    //this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
     callback(null);
   }
 
