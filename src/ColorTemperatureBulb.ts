@@ -58,6 +58,10 @@ export class ColorTemperatureBulbExample {
 
     
     this.service.getCharacteristic(this.platform.Characteristic.ColorTemperature)
+      .setProps({
+        minValue: 150,
+        maxValue: 400,
+      })
       .on('set', this.setCt.bind(this))                
       .on('get', this.getCt.bind(this));  
 

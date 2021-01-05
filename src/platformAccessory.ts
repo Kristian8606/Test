@@ -94,6 +94,7 @@ export class ExamplePlatformAccessory {
     });
     */
     //this.historyService.log = this.platform.log; // swicthed off to prevent flooding the log
+    /* -------------------------- HISTORY
     this.historyService = new this.FakeGatoHistoryService('switch', this.accessory,
       {storage: 'fs',
         minutes:10});
@@ -107,7 +108,7 @@ export class ExamplePlatformAccessory {
       this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
 
     }
-  
+    *///-----------------------end
     setInterval(() => {
       this.platform.log.debug('Running interval');
       /*
@@ -117,10 +118,11 @@ export class ExamplePlatformAccessory {
       this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000),
         temp: this.temperatureVal, pressure: this.pressureVal, humidity: this.humidityVal});
         */ 
+      /*
       if(this.historyService.SerialNumber === accessory.context.device.exampleUniqueId){
         this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
 
-      }
+      }*/
     }, 1000 * 60 * historyInterval);
     
     setInterval(() => {
