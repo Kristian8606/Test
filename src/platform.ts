@@ -1,9 +1,12 @@
+/* eslint-disable max-len */
+/* eslint-disable no-console */
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
+import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, CharacteristicEventTypes, CharacteristicGetCallback, CharacteristicSetCallback, CharacteristicValue } from 'homebridge';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { ExamplePlatformAccessory } from './platformAccessory';
 import { ColorTemperatureBulbExample } from './ColorTemperatureBulb';
+import { log, time, timeStamp } from 'console';
 
 
 /**
@@ -13,11 +16,14 @@ import { ColorTemperatureBulbExample } from './ColorTemperatureBulb';
  */
 
 export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
+
 	public readonly Service: typeof Service = this.api.hap.Service;
 	public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
 	private FakeGatoHistoryService;
 	// this is used to track restored cached accessories
 	public readonly accessories: PlatformAccessory[] = [];
+	public readonly handlle: string[] = [];
+
 
 	constructor(
 		public readonly log: Logger,
@@ -70,13 +76,53 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	  // or a user-defined array in the platform config.
 	  const exampleDevices = [
 	    {
-	      exampleUniqueId: 'AdBfgrCD',
-	      exampleDisplayName: 'Bedroom',
+	      exampleUniqueId: '11111',
+	      exampleDisplayName: 'b',
 	    },
 	    {
-	      exampleUniqueId: 'EFfghhtGH',
-	      exampleDisplayName: 'Kitchen',
+	      exampleUniqueId: '22222',
+	      exampleDisplayName: 'k',
 	    },
+	    {
+	      exampleUniqueId: '33333',
+	      exampleDisplayName: 'r',
+	    },
+	    {
+	      exampleUniqueId: '44444',
+	      exampleDisplayName: 'h',
+	    },
+	    {
+	      exampleUniqueId: '55555',
+	      exampleDisplayName: 'g',
+	    },
+	    {
+	      exampleUniqueId: '66666',
+	      exampleDisplayName: 'j',
+	    },
+	    {
+	      exampleUniqueId: '8556',
+	      exampleDisplayName: 'u',
+		  },
+		  {
+	      exampleUniqueId: '889',
+	      exampleDisplayName: 's',
+		  },
+		  {
+	      exampleUniqueId: '7777',
+	      exampleDisplayName: 't',
+		  },
+		  {
+	      exampleUniqueId: '345353',
+	      exampleDisplayName: 'z',
+		  },
+		  {
+	      exampleUniqueId: '99976',
+	      exampleDisplayName: 'q',
+		  },
+		  {
+	      exampleUniqueId: '345262',
+	      exampleDisplayName: 'l',
+		  },
 
 	  ];
 
@@ -84,7 +130,7 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	  // loop over the discovered devices and register each one if it has not already been registered
 	  for (const device of exampleDevices) {
-		 
+
 	    // generate a unique id for the accessory this should be generated from
 	    // something globally unique, but constant, for example, the device serial
 	    // number or MAC address
@@ -93,6 +139,7 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	    // see if an accessory with the same uuid has already been registered and restored from
 	    // the cached devices we stored in the `configureAccessory` method above
 	    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+
 
 	    if (existingAccessory) {
 	      // the accessory already exists
@@ -108,8 +155,10 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	        //new ExamplePlatformAccessory(this, existingAccessory);
 	        new ColorTemperatureBulbExample(this, existingAccessory);
+	        this.test(existingAccessory);
 	        // update accessory cache with any changes to the accessory details and information
 	        this.api.updatePlatformAccessories([existingAccessory]);
+
 	      } else if (!device) {
 	        // it is possible to remove platform accessories at any time using `api.unregisterPlatformAccessories`, eg.:
 	        // remove platform accessories when no longer present
@@ -122,7 +171,6 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	      // create a new accessory
 	      const accessory = new this.api.platformAccessory(device.exampleDisplayName, uuid);
-
 	      // store a copy of the device object in the `accessory.context`
 	      // the `context` property can be used to store any data about the accessory you may need
 	      accessory.context.device = device;
@@ -134,9 +182,49 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	      //new ExamplePlatformAccessory(this, accessory);
 	      new ColorTemperatureBulbExample(this, accessory);
 
+
+
 	      // link the accessory to your platform
 	      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+	      this.test(accessory);
 	    }
+
 	  }
+
+
+	}
+
+	test(accessory: PlatformAccessory): void {
+
+		accessory.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.On)
+		  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+		    // this.log.info('%s Light was set to: ' + value, accessory.context.device.exampleDisplayName);
+		    callback();
+		  });
+
+		accessory.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.Brightness)
+		  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+		    this.log.info('%s Light was set Brightness to: ' + value, accessory.context.device.exampleDisplayName);
+
+		    this.sendCommand(value, accessory.context.device.exampleDisplayName);
+
+		    callback();
+		  });
+
+
+	}
+
+
+	sendCommand(value, name) {
+	  let time = 0;
+	  time = this.handlle.length * 100;
+	  this.handlle.push(value);
+	  const a = Date.now();
+	  setTimeout(() => {
+	    console.log('%s %s handlle - %s', name, value + ' ' + (Date.now() - a), this.handlle.length);
+	    this.handlle.pop();
+	  }, time);
+
+
 	}
 }

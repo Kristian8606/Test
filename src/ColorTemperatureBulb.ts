@@ -44,10 +44,9 @@ export class ColorTemperatureBulbExample {
     
 
     // register handlers for the On/Off Characteristic
-    this.service.getCharacteristic(this.platform.Characteristic.On)
-      .on('set', this.setOn.bind(this))                
-      .on('get', this.getOn.bind(this));    
-
+    //this.service.getCharacteristic(this.platform.Characteristic.On);
+      
+    /*
     this.service.getCharacteristic(this.platform.Characteristic.Hue)
       .on('set', this.setHue.bind(this))                
       .on('get', this.getHue.bind(this));  
@@ -61,20 +60,12 @@ export class ColorTemperatureBulbExample {
       .setProps({
         minValue: 150,
         maxValue: 400,
-      })
-      .on('set', this.setCt.bind(this))                
-      .on('get', this.getCt.bind(this));  
-
-    this.service.getCharacteristic(this.platform.Characteristic.SetupTransferTransport)
-      .on('set', this.setTransitionControl.bind(this))                
-      .on('get', this.getTransitionControl.bind(this));  
-
-    this.service.getCharacteristic(this.platform.Characteristic.SupportedTransferTransportConfiguration)
-      .on('get', this.getSCVTC.bind(this));               
-
-      
-    this.service.getCharacteristic(this.platform.Characteristic.Brightness)
-      .on('set', this.setBrightness.bind(this));      
+      });
+     
+      */
+   
+    //this.service.getCharacteristic(this.platform.Characteristic.Brightness);
+        
 
     this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.exampleDisplayName);
 
@@ -92,145 +83,16 @@ export class ColorTemperatureBulbExample {
   }
 
  
-  setOn(value: CharacteristicValue, callback: CharacteristicSetCallback) {
-
-    // implement your own code to turn your device on/off
-    this.exampleStates.On = value as boolean;
-
-    this.platform.log.debug('Set Characteristic On ->', value);
-
-    // you must call the callback function
-    callback(null);
-  }
-
-  setCt(value: CharacteristicValue, callback: CharacteristicSetCallback) {
-
-    // implement your own code to turn your device on/off
-    this.exampleStates.ColorTemperature = value as number;
-
-    this.platform.log.debug('Set Characteristic ColorTemperature -> ', value);
-
-    // you must call the callback function
-    callback(null);
-  }
+  
 
  
-  getSCVTC(callback: CharacteristicGetCallback) {
+ 
+  
 
-    // implement your own code to check if the device is on
-    const isOn = this.exampleStates.ColorTemperature;
-
-   
-
-    this.platform.log.debug('Get Characteristic SCVTC -> ', isOn);
-
-    callback(null, isOn);
-  }
-
-  getCt(callback: CharacteristicGetCallback) {
-
-    // implement your own code to check if the device is on
-    const isOn = this.exampleStates.ColorTemperature;
-
-   
-
-    this.platform.log.debug('Get Characteristic ColorTemperature -> ', isOn);
-
-    callback(null, isOn);
-  }
-
-  setTransitionControl(value: CharacteristicValue, callback: CharacteristicSetCallback) {
-
-    // implement your own code to turn your device on/off
-    this.exampleStates.ColorTemperature = value as number;
-
-    this.platform.log.debug('Set Characteristic CharacteristicValueTransitionControl -> ', value);
-
-    // you must call the callback function
-    callback(null);
-  }
 
  
-  getTransitionControl(callback: CharacteristicGetCallback) {
-
-    // implement your own code to check if the device is on
-    const isOn = this.exampleStates.ColorTemperature;
-
-   
-
-    this.platform.log.debug('Get Characteristic CharacteristicValueTransitionControl -> ', isOn);
-
-    callback(null, isOn);
-  }
-
-  setHue(value: CharacteristicValue, callback: CharacteristicSetCallback) {
-
-    // implement your own code to turn your device on/off
-    this.exampleStates.Hue = value as number;
-
-    this.platform.log.debug('Set Characteristic Hue -> ', value);
-
-    // you must call the callback function
-    callback(null);
-  }
 
  
-  getHue(callback: CharacteristicGetCallback) {
-
-    // implement your own code to check if the device is on
-    const isOn = this.exampleStates.Hue;
-
-   
-
-    this.platform.log.debug('Get Characteristic Hue -> ', isOn);
-
-    callback(null, isOn);
-  }
-
-  setSaturation(value: CharacteristicValue, callback: CharacteristicSetCallback) {
-
-    // implement your own code to turn your device on/off
-    this.exampleStates.Sat = value as number;
-
-    this.platform.log.debug('Set Characteristic Sat -> ', value);
-
-    // you must call the callback function
-    callback(null);
-  }
-
- 
-  getSaturation(callback: CharacteristicGetCallback) {
-
-    // implement your own code to check if the device is on
-    const isOn = this.exampleStates.Sat;
-
-   
-
-    this.platform.log.debug('Get Characteristic Sat -> ', isOn);
-
-    callback(null, isOn);
-  }
-
-  getOn(callback: CharacteristicGetCallback) {
-
-    // implement your own code to check if the device is on
-    const isOn = this.exampleStates.On;
-
-    this.platform.log.debug('Get Characteristic On ->', isOn);
-
-    callback(null, isOn);
-  }
-
- 
-  setBrightness(value: CharacteristicValue, callback: CharacteristicSetCallback) {
-
-    // implement your own code to set the brightness
-    this.exampleStates.Brightness = value as number;
-
-    this.platform.log.debug('Set Characteristic Brightness -> ', value);
-
-    // you must call the callback function
-    callback(null);
-  }
+  
 
 }
