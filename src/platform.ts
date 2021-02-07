@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable max-len */
 /* eslint-disable no-console */
 /* eslint-disable no-mixed-spaces-and-tabs */
@@ -7,6 +8,7 @@ import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { ExamplePlatformAccessory } from './platformAccessory';
 import { ColorTemperatureBulbExample } from './ColorTemperatureBulb';
 import { log, time, timeStamp } from 'console';
+//import WebSocket from 'ws';
 
 
 /**
@@ -42,11 +44,41 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	    log.debug('Executed didFinishLaunching callback');
 	    // run the method to discover / register your devices as accessories
 	    this.discoverDevices();
+	   
+	  });
+	  /*
+	  const WebSocket = require('ws');
+	  const host = '192.168.0.117';
+	  const port = 4444;
+	
+	  const ws = new WebSocket('ws://' + host + ':' + port);
+	
+	  ws.onmessage = function(msg) {
+	  console.log(JSON.parse(msg.data));
+	  };
+	  */
+
+	  const net = require('net');
+
+	  const client = new net.Socket();
+	  client.connect(2222, '192.168.0.117', () => {
+	    console.log('Connected');
+	    client.write('{"id": 0,"method": "JSONRPC.Hello","params": {"locale": "de_DE"}}');
+	    client.write('{"id": 1,"method": "Users.Authenticate","params": {"username": "kriso8606@gmail.com","password": "Kriso1122","deviceName": "my client device"}}');
+	  });
+
+	  client.on('data', (data) => {
+	    console.log('Received: ' + (data));
+	    client.destroy(); // kill client after server's response
+	  });
+
+	  client.on('close', () => {
+	    console.log('Connection closed');
 	  });
 	}
 
 
-
+	
 
 	//loggingService = new FakeGatoHistoryService(accessoryType, Accessory, length);
 
@@ -206,8 +238,9 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 		  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
 		    this.log.info('%s Light was set Brightness to: ' + value, accessory.context.device.exampleDisplayName);
 
-		    this.sendCommand(value, accessory.context.device.exampleDisplayName);
+		   // this.sendCommand(value, accessory.context.device.exampleDisplayName);
 
+		  
 		    callback();
 		  });
 
