@@ -2,12 +2,11 @@
 /* eslint-disable max-len */
 /* eslint-disable no-console */
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, CharacteristicEventTypes, CharacteristicGetCallback, CharacteristicSetCallback, CharacteristicValue } from 'homebridge';
+import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, CharacteristicEventTypes, CharacteristicSetCallback, CharacteristicValue } from 'homebridge';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
-import { ExamplePlatformAccessory } from './platformAccessory';
+//import { ExamplePlatformAccessory } from './platformAccessory';
 import { ColorTemperatureBulbExample } from './ColorTemperatureBulb';
-import { log, time, timeStamp } from 'console';
 //import WebSocket from 'ws';
 
 
