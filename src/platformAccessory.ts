@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 /* eslint-disable max-len */
-import { Service, PlatformAccessory, CharacteristicValue, CharacteristicSetCallback, CharacteristicGetCallback } from 'homebridge';
+import { Service, PlatformAccessory } from 'homebridge';
 //import FakeGatoHistoryService from 'fakegato-history';
 import { ExampleHomebridgePlatform } from './platform';
 import fakegato from 'fakegato-history';
-import { Server, ServerResponse } from 'http';
+//import { Server, ServerResponse } from 'http';
 
 /**
  * Platform Accessory
