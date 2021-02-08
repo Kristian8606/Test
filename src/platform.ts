@@ -67,7 +67,7 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	 */
 	 
-	 const nymea = new NymeaClient('192.168.1.120', 2225);
+	 const nymea = new NymeaClient('192.168.0.110', 2222);
 
 	  const thingClasses = {};
 	  const things = {};
@@ -147,10 +147,8 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	    });
 	  });
 
-
-
 	  nymea.connect();
-
+	  
 
 	}
 
