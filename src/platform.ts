@@ -2,14 +2,13 @@
 /* eslint-disable max-len */
 /* eslint-disable no-console */
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, CharacteristicEventTypes, CharacteristicSetCallback, CharacteristicValue } from 'homebridge';
+import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, CharacteristicGetCallback, PlatformConfig, Service, Characteristic, CharacteristicEventTypes, CharacteristicSetCallback, CharacteristicValue } from 'homebridge';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 //import { ExamplePlatformAccessory } from './platformAccessory';
 import { ColorTemperatureBulbExample } from './ColorTemperatureBulb';
 //import WebSocket from 'ws';
-import readline from 'readline';
-const NymeaClient = require('./nymeaclient');
+
 /**
  * HomebridgePlatform
  * This class is the main constructor for your plugin, this is where you should
@@ -24,7 +23,8 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	// this is used to track restored cached accessories
 	public readonly accessories: PlatformAccessory[] = [];
 	public readonly handlle: string[] = [];
-	
+	data: PlatformAccessory[] = [];
+
 
 
 	constructor(
@@ -44,6 +44,16 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	    log.debug('Executed didFinishLaunching callback');
 	    // run the method to discover / register your devices as accessories
 	    this.discoverDevices();
+<<<<<<< HEAD
+	    this.test();
+	    this.intervalTimers();
+	  });
+
+
+	}
+
+
+=======
 	   
 	  });
 	 
@@ -149,21 +159,18 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	  nymea.connect();
 	  
+>>>>>>> c4b1a714918e3702526776c1433d5e1e3fa0cc4f
 
-	}
 
- 
-	
-	
 
 	//loggingService = new FakeGatoHistoryService(accessoryType, Accessory, length);
 
 	//loggingService = new FakeGatoHistoryService('weather', this, { storage: 'fs' });
 
 	/**
-	 * This function is invoked when homebridge restores cached accessories from disk at startup.
-	 * It should be used to setup event handlers for characteristics and update respective values.
-	 */
+	* This function is invoked when homebridge restores cached accessories from disk at startup.
+	* It should be used to setup event handlers for characteristics and update respective values.
+	*/
 	configureAccessory(accessory: PlatformAccessory) {
 	  // eslint-disable-next-line no-mixed-spaces-and-tabs
 	  this.log.info('Loading accessory from cache:', accessory.displayName);
@@ -173,10 +180,10 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	}
 
 	/**
-	 * This is an example method showing how to register discovered accessories.
-	 * Accessories must only be registered once, previously created accessories
-	 * must not be registered again to prevent "duplicate UUID" errors.
-	 */
+	* This is an example method showing how to register discovered accessories.
+	* Accessories must only be registered once, previously created accessories
+	* must not be registered again to prevent "duplicate UUID" errors.
+	*/
 	discoverDevices() {
 
 	  // EXAMPLE ONLY
@@ -186,56 +193,68 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	    {
 	      exampleUniqueId: '11111',
 	      exampleDisplayName: 'b',
+	      exampleStates: true,
 	    },
 	    {
 	      exampleUniqueId: '22222',
 	      exampleDisplayName: 'k',
+	      exampleStates: true,
 	    },
 	    {
 	      exampleUniqueId: '33333',
 	      exampleDisplayName: 'r',
+	      exampleStates: true,
 	    },
 	    {
 	      exampleUniqueId: '44444',
 	      exampleDisplayName: 'h',
+	      exampleStates: true,
 	    },
 	    {
 	      exampleUniqueId: '55555',
 	      exampleDisplayName: 'g',
+	      exampleStates: true,
 	    },
 	    {
 	      exampleUniqueId: '66666',
 	      exampleDisplayName: 'j',
+	      exampleStates: false,
 	    },
 	    {
 	      exampleUniqueId: '8556',
 	      exampleDisplayName: 'u',
-		  },
-		  {
+	      exampleStates: true,
+	    },
+	    {
 	      exampleUniqueId: '889',
 	      exampleDisplayName: 's',
-		  },
-		  {
+	      exampleStates: true,
+	    },
+	    {
 	      exampleUniqueId: '7777',
 	      exampleDisplayName: 't',
-		  },
-		  {
+	      exampleStates: true,
+	    },
+	    {
 	      exampleUniqueId: '345353',
 	      exampleDisplayName: 'z',
-		  },
-		  {
+	      exampleStates: true,
+	    },
+	    {
 	      exampleUniqueId: '99976',
 	      exampleDisplayName: 'q',
-		  },
-		  {
+	      exampleStates: true,
+	    },
+	    {
 	      exampleUniqueId: '345262',
 	      exampleDisplayName: 'l',
-		  },
+	      exampleStates: false,
+	    },
 
 	  ];
 
 
-
+      
 	  // loop over the discovered devices and register each one if it has not already been registered
 	  for (const device of exampleDevices) {
 
@@ -263,7 +282,8 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	        //new ExamplePlatformAccessory(this, existingAccessory);
 	        new ColorTemperatureBulbExample(this, existingAccessory);
-	        this.test(existingAccessory);
+	        this.data.push(existingAccessory);
+	        // this.test(existingAccessory);
 	        // update accessory cache with any changes to the accessory details and information
 	        this.api.updatePlatformAccessories([existingAccessory]);
 
@@ -289,12 +309,12 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	      //new ExamplePlatformAccessory(this, accessory);
 	      new ColorTemperatureBulbExample(this, accessory);
-
+	      this.data.push(accessory);
 
 
 	      // link the accessory to your platform
 	      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-	      this.test(accessory);
+	      //this.test(accessory);
 	    }
 
 	  }
@@ -302,38 +322,62 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	}
 
-	test(accessory: PlatformAccessory): void {
+	test(): void {
 
-		accessory.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.On)
-		  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-		    // this.log.info('%s Light was set to: ' + value, accessory.context.device.exampleDisplayName);
-		    callback();
-		  });
+	  this.data.forEach(obj => {
 
-		accessory.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.Brightness)
-		  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-		    this.log.info('%s Light was set Brightness to: ' + value, accessory.context.device.exampleDisplayName);
 
-		   // this.sendCommand(value, accessory.context.device.exampleDisplayName);
 
-		  
-		    callback();
-		  });
+			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.On)
+			  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+			    obj.context.device.exampleStates = value;
+			    this.log.info('Light State set to- : ' + value);
+			    callback();
+			  });
 
+
+			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.On)
+			  .on('get', (callback: CharacteristicGetCallback) => {
+			    const value = obj.context.device.exampleStates as boolean;
+			    this.log.info('Get Light State - %s: %s', value, obj.context.device.exampleDisplayName);
+			    callback(null, value);
+			  });
+
+			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.Brightness)
+			  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+			    this.log.info('%s Light was set Brightness to: ' + value, obj.context.device.exampleDisplayName);
+			    //this.log.info('%s Light ' + value, accessory.context.device.exampleUniqueId);
+
+			    // this.sendCommand(value, accessory.context.device.exampleDisplayName);
+
+
+			    callback();
+			  });
+
+
+			
+
+	  });
 
 	}
 
 
-	sendCommand(value, name) {
-	  let time = 0;
-	  time = this.handlle.length * 100;
-	  this.handlle.push(value);
-	  const a = Date.now();
-	  setTimeout(() => {
-	    console.log('%s %s handlle - %s', name, value + ' ' + (Date.now() - a), this.handlle.length);
-	    this.handlle.pop();
-	  }, time);
+	intervalTimers(){
+	  setInterval(() => {
+	    //  const uuid = this.api.hap.uuid.generate('345262');
+	    //  
+	    this.data.forEach(value => {
+	     // const val = this.accessories.find(accessory => accessory.UUID === '345262');
+	     
+				  value.getService(this.api.hap.Service.Lightbulb)!
+				    .updateCharacteristic(this.api.hap.Characteristic.Brightness, Math.random() * 100);
+				  this.log.info('%s Light update value ');
+			 
+
+	    });
 
 
+		  }, 2000);
 	}
+	
 }
