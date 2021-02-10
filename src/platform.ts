@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 /* eslint-disable no-console */
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, CharacteristicGetCallback, PlatformConfig, Service, Characteristic, CharacteristicEventTypes, CharacteristicSetCallback, CharacteristicValue } from 'homebridge';
+import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, CharacteristicEventTypes, CharacteristicSetCallback, CharacteristicValue } from 'homebridge';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 //import { ExamplePlatformAccessory } from './platformAccessory';
@@ -220,7 +220,7 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	  this.accessories.forEach(obj => {
 
 
-		if(obj.context.device.exampleUniqueId === '345262'){
+	    if(obj.context.device.exampleUniqueId === '345262'){
 		
 		
 			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.On)
@@ -229,8 +229,8 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 			    this.log.info('Light set - %s', value?'On':'Off');
 			    callback();
 			  });
-			}
-/*
+	    }
+	    /*
 
 			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.On)
 			  .on('get', (callback: CharacteristicGetCallback) => {
@@ -263,17 +263,17 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	intervalTimers(){
 	  setInterval(() => {
 	    //  const uuid = this.api.hap.uuid.generate('345262');
-		//  
+	    //  
 		
 	    this.accessories.forEach(dev => {
 			
 	     // const val = this.accessories.find(accessory => accessory.UUID === '345262');
-				if(dev.context.device.exampleUniqueId === '345262'){
+	      if(dev.context.device.exampleUniqueId === '345262'){
 					
 				  dev.getService(this.api.hap.Service.Lightbulb)!
 				    .updateCharacteristic(this.api.hap.Characteristic.Brightness, Math.random()* 100);
 				  this.log.info('Light update value - %s', dev.context.device.exampleDisplayName);
-				}
+	      }
 
 	    });
 
