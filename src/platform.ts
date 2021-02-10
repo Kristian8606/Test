@@ -44,7 +44,6 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	    log.debug('Executed didFinishLaunching callback');
 	    // run the method to discover / register your devices as accessories
 	    this.discoverDevices();
-<<<<<<< HEAD
 	    this.test();
 	    this.intervalTimers();
 	  });
@@ -53,113 +52,6 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	}
 
 
-=======
-	   
-	  });
-	 
-	
-	  /*
-
-	  const net = require('net');
-
-	  const client = new net.Socket();
-	  client.connect(2225, '192.168.1.120', () => {
-	    console.log('Connected');
-	    client.write('{"id": 0,"method": "JSONRPC.Hello","params": {"locale": "de_US"}}');
-	   // client.write('{"id": 1,"method": "Users.Authenticate","params": {"username": "kriso8606@gmail.com","password": "Kriso1122","deviceName": "my client device"}}');
-	  //  client.write('{"actionTypeId": "Generic light","o:params": "$ref:ParamList","thingId": "Uuid"}');
-	  });
-
-	  client.on('data', (data) => {
-	    console.log('Received: ' + (data));
-	    client.destroy(); // kill client after server's response
-	  });
-
-	 */
-	 
-	 const nymea = new NymeaClient('192.168.0.110', 2222);
-
-	  const thingClasses = {};
-	  const things = {};
-
-	  nymea.on('connected', () => {
-	    console.log('Connected to nymea');
-
-	    console.log('Fetching thingclasses');
-	    const getThingClasses = nymea.sendCommand('Integrations.GetThingClasses');
-	    getThingClasses.on('finished', (reply) => {
-	      console.log('ThingClasses received', reply.thingClasses.length);
-	      for (let i = 0; i < reply.thingClasses.length; i++) {
-	        const thingClass = reply.thingClasses[i];
-	        // Convert stateTypes from a list to a map for easier lookup
-	        const stateTypes = {};
-	        for (let j = 0; j < thingClass.stateTypes.length; j++) {
-	          const stateType = thingClass.stateTypes[j];
-	          stateTypes[stateType.id] = stateType;
-	        }
-	        thingClass.stateTypes = stateTypes;
-	        // TODO: same for eventTypes and actionTypes
-
-	        thingClasses[thingClass.id] = thingClass;
-	      }
-	    });
-
-	    console.log('Fetching things');
-	    const getThings = nymea.sendCommand('Integrations.GetThings');
-	    getThings.on('finished', (reply) => {
-	      console.log('Configured things:');
-	      for (let i = 0; i < reply.things.length; i++) {
-	        things[reply.things[i].id] = reply.things[i];
-	        const thing = reply.things[i];
-	        const thingClass = thingClasses[thing.thingClassId];
-	        console.log('Thing:', thing.name, '(' + thingClass.name + ')');
-	        // Convert states from a list to a map for easier lookup
-	        const states = {};
-	        for (let j = 0; j < thing.states.length; j++) {
-	          const state = thing.states[j];
-	          states[state.stateTypeId] = state;
-	          console.log('- State:', thingClass.stateTypes[state.stateTypeId].name, '=', state.value);
-	        }
-	        thing['states'] = states;
-	      }
-	      console.log('Total thing count:', reply.things.length);
-	    });
-
-	    const integrationsNotifications = nymea.registerNotificationHandler('Integrations');
-	    integrationsNotifications.on('notification', (notification, params) => {
-	      //        console.log("notification received", notification)
-	      if (notification === 'Integrations.StateChanged') {
-	        const thing = things[params.thingId];
-	        const thingClass = thingClasses[thing.thingClassId];
-	        console.log('Thing', thing.name, 'changed state', thingClass.stateTypes[params.stateTypeId].name, 'from', thing.states[params.stateTypeId].value, 'to', params.value);
-	        thing.states[params.stateTypeId].value = params.value;
-	      }
-	    });
-
-	  });
-
-	  nymea.on('authenticationRequired', () => {
-	    console.log('Authentication required');
-	    console.log('Username:');
-	    let user;
-	    const rl = readline.createInterface({
-	      input: process.stdin,
-	      output: process.stdout,
-	      terminal: false,
-	    });
-	    rl.on('line', (line)=> {
-	      if (user === undefined) {
-	        user = line;
-	        console.log('Password:');
-	        return;
-	      }
-	      nymea.authenticate(user, line, 'nymea-js-client');
-	    });
-	  });
-
-	  nymea.connect();
-	  
->>>>>>> c4b1a714918e3702526776c1433d5e1e3fa0cc4f
 
 
 
