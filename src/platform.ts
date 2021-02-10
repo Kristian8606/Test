@@ -24,7 +24,7 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	public readonly accessories: PlatformAccessory[] = [];
 	public readonly handlle: string[] = [];
 	data: PlatformAccessory[] = [];
-
+	lightsAccessories = new Map();
 
 
 	constructor(
@@ -174,7 +174,7 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	        //new ExamplePlatformAccessory(this, existingAccessory);
 	        new ColorTemperatureBulbExample(this, existingAccessory);
-	        this.data.push(existingAccessory);
+	       // this.data.push(existingAccessory);
 	        // this.test(existingAccessory);
 	        // update accessory cache with any changes to the accessory details and information
 	        this.api.updatePlatformAccessories([existingAccessory]);
@@ -200,8 +200,9 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 
 	      //new ExamplePlatformAccessory(this, accessory);
-	      new ColorTemperatureBulbExample(this, accessory);
-	      this.data.push(accessory);
+		  new ColorTemperatureBulbExample(this, accessory);
+		  
+	     // this.data.push(accessory);
 
 
 	      // link the accessory to your platform
@@ -216,17 +217,20 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	test(): void {
 
-	  this.data.forEach(obj => {
+	  this.accessories.forEach(obj => {
 
 
-
+		if(obj.context.device.exampleUniqueId === '345262'){
+		
+		
 			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.On)
 			  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
 			    obj.context.device.exampleStates = value;
-			    this.log.info('Light State set to- : ' + value);
+			    this.log.info('Light set - %s', value?'On':'Off');
 			    callback();
 			  });
-
+			}
+/*
 
 			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.On)
 			  .on('get', (callback: CharacteristicGetCallback) => {
@@ -235,6 +239,8 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 			    callback(null, value);
 			  });
 
+
+			  
 			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.Brightness)
 			  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
 			    this.log.info('%s Light was set Brightness to: ' + value, obj.context.device.exampleDisplayName);
@@ -246,7 +252,7 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 			    callback();
 			  });
 
-
+			*/
 			
 
 	  });
@@ -257,14 +263,17 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	intervalTimers(){
 	  setInterval(() => {
 	    //  const uuid = this.api.hap.uuid.generate('345262');
-	    //  
-	    this.data.forEach(value => {
+		//  
+		
+	    this.accessories.forEach(dev => {
+			
 	     // const val = this.accessories.find(accessory => accessory.UUID === '345262');
-	     
-				  value.getService(this.api.hap.Service.Lightbulb)!
-				    .updateCharacteristic(this.api.hap.Characteristic.Brightness, Math.random() * 100);
-				  this.log.info('%s Light update value ');
-			 
+				if(dev.context.device.exampleUniqueId === '345262'){
+					
+				  dev.getService(this.api.hap.Service.Lightbulb)!
+				    .updateCharacteristic(this.api.hap.Characteristic.Brightness, Math.random()* 100);
+				  this.log.info('Light update value - %s', dev.context.device.exampleDisplayName);
+				}
 
 	    });
 

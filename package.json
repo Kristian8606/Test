@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Kristian8606/Test"
+    "url": "git+https://github.com/Kristian8606/Test.git"
   },
   "bugs": {
     "url": "https://github.com/Kristian8606/Test/issues"
@@ -42,5 +42,7 @@
     "rimraf": "^3.0.2",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5"
-  }
+  },
+  "homepage": "https://github.com/Kristian8606/Test#readme",
+  "author": ""
 }

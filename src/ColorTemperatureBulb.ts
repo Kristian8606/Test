@@ -10,6 +10,7 @@ import { ExampleHomebridgePlatform } from './platform';
  */
 export class ColorTemperatureBulbExample {
   private service: Service;
+ 
 
   /**
    * These are just used to create a working example
@@ -39,47 +40,18 @@ export class ColorTemperatureBulbExample {
       .setCharacteristic(this.platform.Characteristic.SerialNumber, 'Default-Serial');
 
    
-    this.service = this.accessory.getService(this.platform.Service.Lightbulb) || this.accessory.addService(this.platform.Service.Lightbulb);
-
+    this.service = this.accessory.getService(this.platform.Service.Lightbulb) || this.accessory.addService(this.platform.Service.Lightbulb);  
+    this.service.getCharacteristic(this.platform.Characteristic.On);
+    this.service.getCharacteristic(this.platform.Characteristic.Brightness);
     
-
-    // register handlers for the On/Off Characteristic
-    //this.service.getCharacteristic(this.platform.Characteristic.On);
-      
-    /*
-    this.service.getCharacteristic(this.platform.Characteristic.Hue)
-      .on('set', this.setHue.bind(this))                
-      .on('get', this.getHue.bind(this));  
-
-    this.service.getCharacteristic(this.platform.Characteristic.Saturation)
-      .on('set', this.setSaturation.bind(this))                
-      .on('get', this.getSaturation.bind(this));  
-
+    this.service.getCharacteristic(this.platform.Characteristic.Hue);
     
-    this.service.getCharacteristic(this.platform.Characteristic.ColorTemperature)
-      .setProps({
-        minValue: 150,
-        maxValue: 400,
-      });
-     
-      */
-   
-    //this.service.getCharacteristic(this.platform.Characteristic.Brightness);
-        
+    this.service.getCharacteristic(this.platform.Characteristic.Saturation);
+    this.service.getCharacteristic(this.platform.Characteristic.ColorTemperature);
 
     this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.exampleDisplayName);
 
    
-    setInterval(() => {
-      // EXAMPLE - inverse the trigger
-
-      // push the new value to HomeKit
-      // motionSensorOneService.updateCharacteristic(this.platform.Characteristic.MotionDetected, motionDetected);
-      // motionSensorTwoService.updateCharacteristic(this.platform.Characteristic.MotionDetected, !motionDetected);
-
-      //this.platform.log.debug('Triggering motionSensorOneService:', motionDetected);
-      //this.platform.log.debug('Triggering motionSensorTwoService:', !motionDetected);
-    }, 10000);
   }
 
  
