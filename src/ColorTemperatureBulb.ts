@@ -22,8 +22,7 @@ export class ColorTemperatureBulbExample {
     Hue: 360,
     Sat: 100,
     ColorTemperature: 155,
-    getSCVTCl: 1,
-    TransitionControl: 155,
+    
   };
 
   
