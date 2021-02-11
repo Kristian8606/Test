@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Service, PlatformAccessory } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicSetCallback, CharacteristicValue, CharacteristicGetCallback } from 'homebridge';
 
 import { ExampleHomebridgePlatform } from './platform';
 
@@ -41,9 +41,12 @@ export class ColorTemperatureBulbExample {
 
    
     this.service = this.accessory.getService(this.platform.Service.Lightbulb) || this.accessory.addService(this.platform.Service.Lightbulb);  
-    this.service.getCharacteristic(this.platform.Characteristic.On);
-    this.service.getCharacteristic(this.platform.Characteristic.Brightness);
-    
+    this.service.getCharacteristic(this.platform.Characteristic.On)
+      .on('set', this.setOn.bind(this))                // SET - bind to the `setOn` method below
+      .on('get', this.getOn.bind(this));   
+    this.service.getCharacteristic(this.platform.Characteristic.Brightness)
+      .on('set', this.setBrightness.bind(this));       // SET - bind to the 'setBrightness` method below
+
     this.service.getCharacteristic(this.platform.Characteristic.Hue);
     
     this.service.getCharacteristic(this.platform.Characteristic.Saturation);
@@ -54,8 +57,40 @@ export class ColorTemperatureBulbExample {
    
   }
 
- 
-  
+  setOn(value: CharacteristicValue, callback: CharacteristicSetCallback) {
+
+    // implement your own code to turn your device on/off
+    this.exampleStates.On = value as boolean;
+
+    this.platform.log.debug('Set Characteristic On ->', value);
+
+    // you must call the callback function
+    callback(null);
+  }
+
+  getOn(callback: CharacteristicGetCallback) {
+
+    // implement your own code to check if the device is on
+    const isOn = this.exampleStates.On;
+
+    this.platform.log.debug('Get Characteristic On ->', isOn);
+
+    // you must call the callback function
+    // the first argument should be null if there were no errors
+    // the second argument should be the value to return
+    callback(null, isOn);
+  }
+
+  setBrightness(value: CharacteristicValue, callback: CharacteristicSetCallback) {
+
+    // implement your own code to set the brightness
+    this.exampleStates.Brightness = value as number;
+
+    this.platform.log.debug('Set Characteristic Brightness -> ', value);
+
+    // you must call the callback function
+    callback(null);
+  }
 
  
  

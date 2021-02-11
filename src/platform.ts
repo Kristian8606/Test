@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 /* eslint-disable no-console */
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, CharacteristicEventTypes, CharacteristicSetCallback, CharacteristicValue } from 'homebridge';
+import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 //import { ExamplePlatformAccessory } from './platformAccessory';
@@ -44,7 +44,6 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	    log.debug('Executed didFinishLaunching callback');
 	    // run the method to discover / register your devices as accessories
 	    this.discoverDevices();
-	    this.test();
 	    this.intervalTimers();
 	  });
 
@@ -145,117 +144,55 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 
 	  ];
 
-
-      
-	  // loop over the discovered devices and register each one if it has not already been registered
 	  for (const device of exampleDevices) {
 
 	    // generate a unique id for the accessory this should be generated from
 	    // something globally unique, but constant, for example, the device serial
 	    // number or MAC address
 	    const uuid = this.api.hap.uuid.generate(device.exampleUniqueId);
-
+  
 	    // see if an accessory with the same uuid has already been registered and restored from
 	    // the cached devices we stored in the `configureAccessory` method above
 	    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
-
-
+  
 	    if (existingAccessory) {
-	      // the accessory already exists
-	      if (device) {
-	        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
-
-	        // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-	        // existingAccessory.context.device = device;
-	        // this.api.updatePlatformAccessories([existingAccessory]);
-
-	        // create the accessory handler for the restored accessory
-	        // this is imported from `platformAccessory.ts`
-
-	        //new ExamplePlatformAccessory(this, existingAccessory);
-	        new ColorTemperatureBulbExample(this, existingAccessory);
-	       // this.data.push(existingAccessory);
-	        // this.test(existingAccessory);
-	        // update accessory cache with any changes to the accessory details and information
-	        this.api.updatePlatformAccessories([existingAccessory]);
-
-	      } else if (!device) {
-	        // it is possible to remove platform accessories at any time using `api.unregisterPlatformAccessories`, eg.:
-	        // remove platform accessories when no longer present
-	        this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
-	        this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
-	      }
+		  // the accessory already exists
+		  this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+  
+		  // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
+		  // existingAccessory.context.device = device;
+		  // this.api.updatePlatformAccessories([existingAccessory]);
+  
+		  // create the accessory handler for the restored accessory
+		  // this is imported from `platformAccessory.ts`
+		  new ColorTemperatureBulbExample(this, existingAccessory);
+  
+		  // it is possible to remove platform accessories at any time using `api.unregisterPlatformAccessories`, eg.:
+		  // remove platform accessories when no longer present
+		  // this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+		  // this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
 	    } else {
-	      // the accessory does not yet exist, so we need to create it
-	      this.log.info('Adding new accessory:', device.exampleDisplayName);
-
-	      // create a new accessory
-	      const accessory = new this.api.platformAccessory(device.exampleDisplayName, uuid);
-	      // store a copy of the device object in the `accessory.context`
-	      // the `context` property can be used to store any data about the accessory you may need
-	      accessory.context.device = device;
-
-	      // create the accessory handler for the newly create accessory
-	      // this is imported from `platformAccessory.ts`
-
-
-	      //new ExamplePlatformAccessory(this, accessory);
+		  // the accessory does not yet exist, so we need to create it
+		  this.log.info('Adding new accessory:', device.exampleDisplayName);
+  
+		  // create a new accessory
+		  const accessory = new this.api.platformAccessory(device.exampleDisplayName, uuid);
+  
+		  // store a copy of the device object in the `accessory.context`
+		  // the `context` property can be used to store any data about the accessory you may need
+		  accessory.context.device = device;
+  
+		  // create the accessory handler for the newly create accessory
+		  // this is imported from `platformAccessory.ts`
 		  new ColorTemperatureBulbExample(this, accessory);
-		  
-	     // this.data.push(accessory);
-
-
-	      // link the accessory to your platform
-	      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-	      //this.test(accessory);
+  
+		  // link the accessory to your platform
+		  this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
 	    }
+      
 
 	  }
 
-
-	}
-
-	test(): void {
-
-	  this.accessories.forEach(obj => {
-
-
-	    if(obj.context.device.exampleUniqueId === '345262'){
-		
-		
-			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.On)
-			  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-			    obj.context.device.exampleStates = value;
-			    this.log.info('Light set - %s', value?'On':'Off');
-			    callback();
-			  });
-	    }
-	    /*
-
-			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.On)
-			  .on('get', (callback: CharacteristicGetCallback) => {
-			    const value = obj.context.device.exampleStates as boolean;
-			    this.log.info('Get Light State - %s: %s', value, obj.context.device.exampleDisplayName);
-			    callback(null, value);
-			  });
-
-
-			  
-			obj.getService(this.api.hap.Service.Lightbulb)!.getCharacteristic(this.api.hap.Characteristic.Brightness)
-			  .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-			    this.log.info('%s Light was set Brightness to: ' + value, obj.context.device.exampleDisplayName);
-			    //this.log.info('%s Light ' + value, accessory.context.device.exampleUniqueId);
-
-			    // this.sendCommand(value, accessory.context.device.exampleDisplayName);
-
-
-			    callback();
-			  });
-
-			*/
-			
-
-	  });
 
 	}
 
@@ -278,7 +215,7 @@ export class ExampleHomebridgePlatform implements DynamicPlatformPlugin {
 	    });
 
 
-		  }, 2000);
+		  }, 5000);
 	}
 	
 }
