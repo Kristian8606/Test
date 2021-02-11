@@ -148,6 +148,22 @@ export class ExamplePlatformAccessory {
     this.web();
   }
 
+    /* -------------------------- HISTORY
+    this.historyService = new this.FakeGatoHistoryService('switch', this.accessory,
+      {storage: 'fs',
+        minutes:10});
+
+    this.historyService.name = accessory.context.device.exampleDisplayName;
+    this.historyService.accessoryName = accessory.context.device.exampleDisplayName;
+    this.historyService.log = this.platform.log;
+    this.historyService.SerialNumber = accessory.context.device.exampleUniqueId;
+
+    if(this.historyService.SerialNumber === accessory.context.device.exampleUniqueId){
+      this.historyService.addEntry({time: Math.round(new Date().valueOf() / 1000), status: this.state});
+
+    }
+    *///-----------------------end
+
   
   handleOnGet(callback) {
     this.platform.log.debug('Triggered GET On');
